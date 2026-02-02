@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DANIBOOM | LOGIN</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{--neon:#ffd700;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
+
+body{
+  background:radial-gradient(circle at top,#111,#000);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+}
+
+.container{
+  width:100%;
+  max-width:420px;
+  padding:2.5rem;
+  border:2px solid var(--neon);
+  border-radius:22px;
+  box-shadow:0 0 35px rgba(255,215,0,.7);
+}
+
+.logo{text-align:center;margin-bottom:1.5rem;}
+.logo img{
+  width:110px;height:110px;
+  border-radius:50%;
+  border:3px solid var(--neon);
+  box-shadow:0 0 30px var(--neon);
+}
+
+.tabs{display:flex;margin-bottom:1.5rem;}
+.tabs button{
+  flex:1;background:none;border:none;
+  color:#777;padding:.6rem;cursor:pointer;
+}
+.tabs button.active{
+  color:var(--neon);
+  text-shadow:0 0 10px var(--neon);
+}
+
+.form{display:none;}
+.form.active{display:block;}
+
+.input{
+  width:100%;padding:.9rem;margin-bottom:.8rem;
+  background:#111;border:2px solid #333;
+  border-radius:12px;color:#fff;
+}
+
+.btn{
+  width:100%;padding:.9rem;
+  border:none;border-radius:30px;
+  background:var(--neon);color:#000;
+  font-weight:800;cursor:pointer;
+}
+
+.social{display:flex;gap:.8rem;margin-top:1rem;}
+.social button{
+  flex:1;padding:.7rem;
+  border-radius:12px;
+  border:2px solid var(--neon);
+  background:none;color:var(--neon);
+  cursor:pointer;
+}
+
+.switch{text-align:center;margin-top:1rem;font-size:13px;color:#aaa;}
+.switch span{color:var(--neon);cursor:pointer;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    <img src="logo.png">
+  </div>
+
+  <div class="tabs">
+    <button id="tabLogin" class="active">INICIAR SESIÓN</button>
+    <button id="tabRegister">CREAR CUENTA</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="form active" id="loginForm">
+    <input id="loginEmail" class="input" placeholder="Correo">
+    <input id="loginPassword" type="password" class="input" placeholder="Contraseña">
+    <button class="btn" id="loginBtn">Entrar</button>
+
+    <div class="social">
+      <button id="googleBtn"><i class="fab fa-google"></i> Google</button>
+      <button id="anonBtn"><i class="fas fa-user-secret"></i> Invitado</button>
+    </div>
+
+    <p class="switch">¿No tienes cuenta? <span id="goRegister">Crear cuenta</span></p>
+  </div>
+
+  <!-- REGISTRO -->
+  <div class="form" id="registerForm">
+    <input id="regEmail" class="input" placeholder="Correo">
+    <input id="regPassword" type="password" class="input" placeholder="Contraseña">
+    <button class="btn" id="registerBtn">Crear cuenta</button>
+
+    <p class="switch">¿Ya tienes cuenta? <span id="goLogin">Iniciar sesión</span></p>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+/* 🔥 FIREBASE CONFIG */
+const firebaseConfig = {
+  apiKey: "AIzaSyChOQg743fsmGK89KVLoNAri_VGklArRi4",
+  authDomain: "web1-3b83a.firebaseapp.com",
+  projectId: "web1-3b83a"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* 🔥 GOOGLE REDIRECT RESULT */
+const provider = new GoogleAuthProvider();
+
+await getRedirectResult(auth).catch(()=>{});
+
+/* 🔥 AUTH STATE */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      email: user.email || "anon",
+      role: user.isAnonymous ? "Invitado" : "Miembro",
+      membership: user.isAnonymous ? "guest" : "free",
+      createdAt: new Date()
+    });
+  }
+
+  window.location.href = "main.html";
+});
+
+/* EMAIL LOGIN */
+loginBtn.onclick = () =>
+  signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value)
+  .catch(()=>alert("Correo o contraseña incorrectos"));
+
+/* REGISTER */
+registerBtn.onclick = () =>
+  createUserWithEmailAndPassword(auth, regEmail.value, regPassword.value)
+  .catch(()=>alert("Error al crear cuenta"));
+
+/* GOOGLE */
+googleBtn.onclick = () =>
+  signInWithRedirect(auth, provider);
+
+/* ANON */
+anonBtn.onclick = () =>
+  signInAnonymously(auth);
+
+/* UI */
+tabRegister.onclick = goRegister.onclick = () => {
+  loginForm.classList.remove("active");
+  registerForm.classList.add("active");
+  tabLogin.classList.remove("active");
+  tabRegister.classList.add("active");
+};
+
+tabLogin.onclick = goLogin.onclick = () => {
+  registerForm.classList.remove("active");
+  loginForm.classList.add("active");
+  tabRegister.classList.remove("active");
+  tabLogin.classList.add("active");
+};
+</script>
+
+</body>
+</html>
