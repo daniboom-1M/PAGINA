@@ -87,8 +87,8 @@ main{padding:120px 2rem 3rem;}
       <div class="menu-popup" id="menuPopup">
         <div class="profile-box">
           <img id="profilePic" src="default.png" alt="Perfil">
-          <p id="profileName">Cargando...</p>
-          <span id="profileRole">Rol: Invitado</span>
+          <p id="profileName"></p>
+          <span id="profileRole"></span>
           <div class="btn-row">
             <button id="viewProfile" onclick="window.location.href='rede.html'">Ver Perfil</button>
             <button id="logoutBtn">Cerrar Sesión</button>
@@ -124,6 +124,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebas
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 import { getFirestore, collection, onSnapshot, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+// FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyChOQg743fsmGK89KVLoNAri_VGklArRi4",
   authDomain: "web1-3b83a.firebaseapp.com",
@@ -132,7 +133,7 @@ const firebaseConfig = {
   messagingSenderId: "519590670968",
   appId: "1:519590670968:web:cb291125919a12e9e7b"
 };
-const app = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 
@@ -157,38 +158,48 @@ menuBtn.addEventListener('click', ()=>{
   menuPopup.style.flexDirection='column';
 });
 
-// DETECCIÓN USUARIO Y ROLES
+// CARGAR DATOS USUARIO
 onAuthStateChanged(auth, async user=>{
-  let membership="Invitado";
-  let displayNameText="Cargando...";
   if(user){
     const userRef = doc(db,"users",user.uid);
     const docSnap = await getDoc(userRef);
     if(docSnap.exists()){
       const data = docSnap.data();
-      displayNameText = data.displayName || "Anónimo";
-      membership = data.membership || "Invitado";
+      profileName.textContent = data.displayName || "Sin Nombre";
+      profileRole.textContent = "Rol: " + (data.membership || "Invitado");
       profilePic.src = data.photoURL || "default.png";
-    }
-  }
-  profileName.textContent = displayNameText;
-  profileRole.textContent = "Rol: "+membership;
 
-  if(membership==="anonymous" || membership==="Invitado"){
+      // Mostrar opciones según rol
+      if(data.membership==="admin" || data.membership==="owner"){ adminUtils.style.display="block"; }
+      else{ adminUtils.style.display="none"; }
+
+      logoutBtn.style.display="block";
+      sensibilidadesLink.style.display="inline-block";
+    } else {
+      // Usuario sin datos en Firestore
+      profileName.textContent = "Anónimo";
+      profileRole.textContent = "Rol: Invitado";
+      profilePic.src = "default.png";
+      logoutBtn.style.display="none";
+      adminUtils.style.display="none";
+      sensibilidadesLink.style.display="none";
+    }
+  } else {
+    // No logueado
+    profileName.textContent = "Invitado";
+    profileRole.textContent = "Rol: Invitado";
+    profilePic.src = "default.png";
     logoutBtn.style.display="none";
     adminUtils.style.display="none";
     sensibilidadesLink.style.display="none";
-  } else {
-    logoutBtn.style.display="block";
-    sensibilidadesLink.style.display="inline-block";
-    if(membership==="admin" || membership==="owner"){ adminUtils.style.display="block"; }
-    else { adminUtils.style.display="none"; }
   }
 });
 
 // NOTIFICACIONES
 const notificationsRef = collection(db,"notifications");
 onSnapshot(notificationsRef,snapshot=>{
+  const videosSection = document.getElementById('videosSection');
+  const systemSection = document.getElementById('systemSection');
   videosSection.innerHTML="";
   systemSection.innerHTML="";
   let hasUnread=false;
@@ -196,6 +207,7 @@ onSnapshot(notificationsRef,snapshot=>{
   snapshot.docs.forEach(docSnap=>{
     const notif = docSnap.data();
     if(notif.deleted) return;
+
     const card = document.createElement("div");
     card.className="notification-card";
     card.innerHTML=`<h3>${notif.title}</h3><p>${notif.message}</p>`;
@@ -204,9 +216,10 @@ onSnapshot(notificationsRef,snapshot=>{
     timer.className="timer-circle";
     card.appendChild(timer);
 
-    let start = notif.startTime||Date.now();
-    let duration = notif.duration||30000;
+    let start = notif.startTime || Date.now();
+    let duration = notif.duration || 30000;
     let end = start+duration;
+
     const interval = setInterval(()=>{
       let remaining = Math.max(Math.ceil((end-Date.now())/1000),0);
       timer.textContent=remaining;
