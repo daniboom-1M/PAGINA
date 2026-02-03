@@ -209,39 +209,7 @@ main{padding:120px 2rem 3rem;}
 
   <div style="display:flex;align-items:center;gap:1rem;position:relative;">
     
-    <!-- CAMPANA -->
-    <div class="notification-btn" id="notificationBtn">
-      <i class="fa fa-bell"></i>
-      <div class="dot" id="notificationDot"></div>
-    </div>
-
-    <!-- 3 PUNTOS -->
-    <div style="position:relative;">
-      <div class="menu-btn" id="menuBtn">
-        <span></span><span></span><span></span>
-      </div>
-
-      <div class="menu-popup" id="menuPopup">
-        <div class="profile-box">
-          <img id="profilePic" src="default.png" alt="Perfil">
-          <p id="profileName">Cargando...</p>
-          <span id="profileRole">Rol: Invitado</span>
-          <button id="viewProfile" onclick="window.location.href='rede.html'">Redes</button>
-          <button id="sensibilidadesBtn" onclick="alert('Accede a sensibilidades');">Sensibilidades</button>
-          <button id="logoutBtn">Cerrar Sesión</button>
-          <button id="loginPrompt" style="display:none;">Iniciar Sesión</button>
-        </div>
-
-        <!-- ADMIN UTILIDADES -->
-        <div id="adminBox" style="display:none;">
-          <p style="color:gold;text-align:center;">Administrador</p>
-          <button onclick="window.location.href='notificaciones.html'">Enviar Notificación</button>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
+    
 </header>
 
 <main>
@@ -250,7 +218,49 @@ main{padding:120px 2rem 3rem;}
 </main>
 
 <div id="notificationsPanel">
-  <div class="closeBtn" id="closeNotif">&times;</div>
+  <div class="closeBtn" id="closeNotif">&times;</<!-- Contenedor campana + 3 puntos -->
+<div style="display:flex;align-items:center;gap:1rem;position:relative;">
+
+  <!-- CAMPANA -->
+  <div class="notification-btn" id="notificationBtn">
+    <i class="fa fa-bell"></i>
+    <div class="dot" id="notificationDot"></div>
+  </div>
+
+  <!-- 3 PUNTOS -->
+  <div style="position:relative;">
+    <div class="menu-btn" id="menuBtn">
+      <span></span><span></span><span></span>
+    </div>
+
+    <!-- POPUP DEL MENÚ -->
+    <div class="menu-popup" id="menuPopup">
+      <div class="profile-box">
+        <img id="profilePic" src="default.png" alt="Perfil">
+        <p id="profileName">Cargando...</p>
+        <span id="profileRole">Rol: Invitado</span>
+
+        <!-- Botón redes -->
+        <button id="viewProfile" onclick="window.location.href='rede.html'">Redes</button>
+
+        <!-- Sensibilidades solo para usuarios no anónimos -->
+        <button id="sensibilidadesBtn" style="display:none;" onclick="window.location.href='sensibilidades.html'">
+          Sensibilidades
+        </button>
+
+        <!-- Botones según estado -->
+        <button id="logoutBtn" style="display:none;">Cerrar Sesión</button>
+        <button id="loginPrompt" style="display:none;" onclick="window.location.href='login.html'">Iniciar Sesión</button>
+
+        <!-- Utilidades admins/owners -->
+        <div id="adminUtils" style="display:none;margin-top:0.5rem;">
+          <button onclick="window.location.href='notificaciones.html'">Gestionar Notificaciones</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
   <div class="section" id="videosSection">
     <h2>Videos Nuevos</h2>
   </div>
