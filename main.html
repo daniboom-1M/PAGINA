@@ -53,7 +53,7 @@ header .logo span{font-family:'Press Start 2P';font-size:.9rem;color:#ffd700;tex
 .menu-texts span{cursor:pointer;color:#ffd700;font-weight:700;text-decoration:underline;}
 
 /* BOTONES Y UTILIDADES */
-#sensibilidadesBtn{display:none;}
+#sensibilidadesLink{display:none;}
 #adminUtils{display:none;margin-top:0.5rem;}
 
 /* MAIN */
@@ -144,7 +144,7 @@ main{padding:120px 2rem 3rem;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyChOQg743fsmGK89KVLoNAri_VGklArRi4",
@@ -158,7 +158,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 
-// ELEMENTOS
 const profilePic = document.getElementById('profilePic');
 const profileName = document.getElementById('profileName');
 const profileRole = document.getElementById('profileRole');
@@ -170,10 +169,6 @@ const sensibilidadesLink = document.getElementById('sensibilidadesLink');
 const notificationBtn = document.getElementById('notificationBtn');
 const notificationDot = document.getElementById('notificationDot');
 const notificationsPanel = document.getElementById('notificationsPanel');
-const closeNotif = document.getElementById('closeNotif');
-const videosSection = document.getElementById('videosSection');
-const systemSection = document.getElementById('systemSection');
-const loginPrompt = document.getElementById('loginPrompt');
 
 // MENÚ 3 PUNTOS
 menuBtn.addEventListener('click', ()=>{
@@ -184,26 +179,24 @@ menuBtn.addEventListener('click', ()=>{
 
 // DETECCIÓN USUARIO
 onAuthStateChanged(auth, async user=>{
-  let role = "Invitado";
+  let role="Invitado";
   if(user){
     const userRef = doc(db,"users",user.uid);
-    const docSnap = await userRef.get();
-    if(docSnap.exists){
+    const docSnap = await getDoc(userRef); // <- CORRECTO Firebase 12
+    if(docSnap.exists()){
       const data = docSnap.data();
-      profileName.textContent = data.displayName||"Anónimo";
+      profileName.textContent = data.displayName || "Anónimo";
       profileRole.textContent = "Rol: "+(data.role||"Invitado");
-      profilePic.src = data.photoURL||"default.png";
-      role = data.role||"Invitado";
+      profilePic.src = data.photoURL || "default.png";
+      role = data.role || "Invitado";
     }
   }
 
   if(role==="anonymous"){
-    loginPrompt.style.display="block";
     logoutBtn.style.display="none";
     adminUtils.style.display="none";
     sensibilidadesLink.style.display="none";
   } else {
-    loginPrompt.style.display="none";
     logoutBtn.style.display="block";
     sensibilidadesLink.style.display="inline-block";
     if(role==="admin" || role==="owner"){ adminUtils.style.display="block"; }
@@ -214,6 +207,8 @@ onAuthStateChanged(auth, async user=>{
 // NOTIFICACIONES
 const notificationsRef = collection(db,"notifications");
 onSnapshot(notificationsRef,snapshot=>{
+  const videosSection=document.getElementById('videosSection');
+  const systemSection=document.getElementById('systemSection');
   videosSection.innerHTML="";
   systemSection.innerHTML="";
   let hasUnread=false;
@@ -247,7 +242,6 @@ onSnapshot(notificationsRef,snapshot=>{
 
     if(notif.section==="videos") videosSection.appendChild(card);
     else systemSection.appendChild(card);
-
     hasUnread=true;
   });
 
@@ -261,9 +255,6 @@ notificationBtn.addEventListener('click', ()=>{
   notificationBtn.classList.remove('shake');
   notificationDot.style.display="none";
 });
-
-// CERRAR PANEL
-closeNotif.addEventListener('click', ()=>{ notificationsPanel.classList.remove('show'); });
 
 // LOGOUT
 logoutBtn.addEventListener('click', async()=>{ await signOut(auth); window.location.href="index.html"; });
