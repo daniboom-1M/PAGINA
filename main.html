@@ -11,7 +11,11 @@
 body{background:#0b0b0b;color:#fff;overflow-x:hidden;}
 
 /* HEADER */
-header{position:fixed;top:0;width:100%;z-index:1000;display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:rgba(0,0,0,.45);backdrop-filter:blur(10px);}
+header{
+  position:fixed;top:0;width:100%;z-index:1000;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1rem 2rem;background:rgba(0,0,0,.45);backdrop-filter:blur(10px);
+}
 header .logo{display:flex;align-items:center;gap:1rem;}
 header .logo img{width:55px;height:55px;border-radius:50%;border:2px solid gold;}
 header .logo span{font-family:'Press Start 2P';font-size:.9rem;color:#ffd700;text-shadow:0 0 6px gold,0 0 18px gold;}
@@ -30,13 +34,22 @@ header .logo span{font-family:'Press Start 2P';font-size:.9rem;color:#ffd700;tex
 .menu-btn.active span:nth-child(2){opacity:0;}
 .menu-btn.active span:nth-child(3){transform:rotate(-45deg) translate(6px,-6px);}
 
-.menu-popup{position:absolute;top:60px;right:0;background:#111;border:2px solid gold;border-radius:12px;padding:1rem;display:none;flex-direction:column;gap:1rem;box-shadow:0 0 15px gold;min-width:220px;z-index:2000;}
-.profile-box{display:flex;flex-direction:column;align-items:center;background:#222;border:2px solid gold;border-radius:12px;padding:1rem;gap:0.5rem;width:100%;}
+.menu-popup{
+  position:absolute;top:60px;right:0;
+  background:#111;border:2px solid gold;border-radius:12px;
+  padding:1rem;display:none;flex-direction:column;gap:1rem;
+  box-shadow:0 0 15px gold;min-width:220px;z-index:2000;
+}
+.profile-box{
+  display:flex;flex-direction:column;align-items:center;background:#222;border:2px solid gold;border-radius:12px;padding:1rem;gap:0.5rem;width:100%;
+}
 .profile-box img{width:60px;height:60px;border-radius:50%;border:2px solid gold;}
 .profile-box p{color:gold;font-weight:700;text-align:center;}
 .profile-box span{color:#ccc;font-size:0.8rem;text-align:center;}
 .profile-box .btn-row{display:flex;gap:0.5rem;width:100%;justify-content:center;}
 .profile-box .btn-row button{flex:1;padding:.5rem;font-weight:700;background:gold;color:#000;border:none;border-radius:12px;cursor:pointer;}
+
+/* Textos fuera del cuadro */
 .menu-texts{display:flex;flex-direction:column;gap:0.3rem;text-align:center;margin-top:0.5rem;}
 .menu-texts span{cursor:pointer;color:#ffd700;font-weight:700;text-decoration:underline;}
 
@@ -50,12 +63,17 @@ main{padding:120px 2rem 3rem;}
 .desc{text-align:center;color:#aaa;margin-bottom:2rem;}
 
 /* NOTIFICACIONES PANEL */
-#notificationsPanel{position:fixed;top:0;right:-100%;width:100%;height:100%;background:#111;z-index:9999;transition:right .5s ease;overflow-y:auto;padding:2rem;}
+#notificationsPanel{
+  position:fixed;top:0;right:-100%;width:100%;height:100%;
+  background:#111;z-index:9999;transition:right .5s ease;overflow-y:auto;padding:2rem;
+}
 #notificationsPanel.show{right:0;}
 #notificationsPanel .closeBtn{position:absolute;top:10px;right:10px;font-size:1.5rem;color:#ff0000;cursor:pointer;}
 .section{margin-bottom:2rem;}
 .section h2{color:gold;font-size:1.5rem;margin-bottom:1rem;text-shadow:0 0 6px gold;}
-.notification-card{background:#222;border:2px solid gold;border-radius:12px;padding:1rem;margin-bottom:1rem;position:relative;}
+.notification-card{
+  background:#222;border:2px solid gold;border-radius:12px;padding:1rem;margin-bottom:1rem;position:relative;
+}
 .notification-card h3{color:gold;margin-bottom:0.5rem;}
 .notification-card p{color:#ccc;margin-bottom:0.5rem;}
 .notification-card a{display:inline-block;padding:.5rem 1rem;background:gold;color:#000;text-decoration:none;border-radius:6px;font-weight:700;}
@@ -63,7 +81,10 @@ main{padding:120px 2rem 3rem;}
 .timer-circle{position:absolute;top:5px;left:5px;width:25px;height:25px;border:2px solid gold;border-radius:50%;font-size:0.6rem;display:flex;justify-content:center;align-items:center;color:gold;}
 
 /* RESPONSIVE */
-@media(max-width:768px){main{padding:150px 1rem 3rem;}.menu-popup{right:10px;top:60px;}}
+@media(max-width:768px){
+  main{padding:150px 1rem 3rem;}
+  .menu-popup{right:10px;top:60px;}
+}
 </style>
 </head>
 <body>
@@ -83,12 +104,14 @@ main{padding:120px 2rem 3rem;}
 
     <!-- 3 PUNTOS -->
     <div style="position:relative;">
-      <div class="menu-btn" id="menuBtn"><span></span><span></span><span></span></div>
+      <div class="menu-btn" id="menuBtn">
+        <span></span><span></span><span></span>
+      </div>
       <div class="menu-popup" id="menuPopup">
         <div class="profile-box">
           <img id="profilePic" src="default.png" alt="Perfil">
-          <p id="profileName"></p>
-          <span id="profileRole"></span>
+          <p id="profileName">Cargando...</p>
+          <span id="profileRole">Cargando rol...</span>
           <div class="btn-row">
             <button id="viewProfile" onclick="window.location.href='rede.html'">Ver Perfil</button>
             <button id="logoutBtn">Cerrar Sesión</button>
@@ -122,9 +145,8 @@ main{padding:120px 2rem 3rem;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { getFirestore, collection, onSnapshot, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-// FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyChOQg743fsmGK89KVLoNAri_VGklArRi4",
   authDomain: "web1-3b83a.firebaseapp.com",
@@ -133,7 +155,7 @@ const firebaseConfig = {
   messagingSenderId: "519590670968",
   appId: "1:519590670968:web:cb291125919a12e9e7b"
 };
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 
@@ -150,56 +172,59 @@ const notificationBtn = document.getElementById('notificationBtn');
 const notificationDot = document.getElementById('notificationDot');
 const notificationsPanel = document.getElementById('notificationsPanel');
 const closeNotif = document.getElementById('closeNotif');
+const videosSection = document.getElementById('videosSection');
+const systemSection = document.getElementById('systemSection');
+const loginPrompt = document.getElementById('loginPrompt');
 
-// MENU 3 PUNTOS
+// MENÚ 3 PUNTOS
 menuBtn.addEventListener('click', ()=>{
   menuBtn.classList.toggle('active');
   menuPopup.style.display = (menuPopup.style.display==='flex')?'none':'flex';
   menuPopup.style.flexDirection='column';
 });
 
-// CARGAR DATOS USUARIO
+// DETECCIÓN USUARIO
 onAuthStateChanged(auth, async user=>{
   if(user){
     const userRef = doc(db,"users",user.uid);
     const docSnap = await getDoc(userRef);
     if(docSnap.exists()){
       const data = docSnap.data();
-      profileName.textContent = data.displayName || "Sin Nombre";
-      profileRole.textContent = "Rol: " + (data.membership || "Invitado");
+      profileName.textContent = data.displayName || "Anónimo";
+      profileRole.textContent = "Rol: " + (data.membership || "Miembro");
       profilePic.src = data.photoURL || "default.png";
 
-      // Mostrar opciones según rol
-      if(data.membership==="admin" || data.membership==="owner"){ adminUtils.style.display="block"; }
-      else{ adminUtils.style.display="none"; }
-
-      logoutBtn.style.display="block";
-      sensibilidadesLink.style.display="inline-block";
-    } else {
-      // Usuario sin datos en Firestore
-      profileName.textContent = "Anónimo";
-      profileRole.textContent = "Rol: Invitado";
-      profilePic.src = "default.png";
-      logoutBtn.style.display="none";
-      adminUtils.style.display="none";
-      sensibilidadesLink.style.display="none";
+      // Opciones según membership
+      if(data.membership === "anonymous"){
+        logoutBtn.style.display = "none";
+        adminUtils.style.display = "none";
+        sensibilidadesLink.style.display = "none";
+        loginPrompt.style.display = "block";
+      } else {
+        logoutBtn.style.display = "block";
+        loginPrompt.style.display = "none";
+        sensibilidadesLink.style.display = "inline-block";
+        if(data.membership === "admin" || data.membership === "owner"){
+          adminUtils.style.display = "block";
+        } else {
+          adminUtils.style.display = "none";
+        }
+      }
     }
   } else {
-    // No logueado
-    profileName.textContent = "Invitado";
-    profileRole.textContent = "Rol: Invitado";
-    profilePic.src = "default.png";
+    profileName.textContent="Invitado";
+    profileRole.textContent="Rol: Invitado";
+    profilePic.src="default.png";
     logoutBtn.style.display="none";
     adminUtils.style.display="none";
     sensibilidadesLink.style.display="none";
+    loginPrompt.style.display="block";
   }
 });
 
 // NOTIFICACIONES
 const notificationsRef = collection(db,"notifications");
 onSnapshot(notificationsRef,snapshot=>{
-  const videosSection = document.getElementById('videosSection');
-  const systemSection = document.getElementById('systemSection');
   videosSection.innerHTML="";
   systemSection.innerHTML="";
   let hasUnread=false;
@@ -207,7 +232,6 @@ onSnapshot(notificationsRef,snapshot=>{
   snapshot.docs.forEach(docSnap=>{
     const notif = docSnap.data();
     if(notif.deleted) return;
-
     const card = document.createElement("div");
     card.className="notification-card";
     card.innerHTML=`<h3>${notif.title}</h3><p>${notif.message}</p>`;
@@ -216,17 +240,17 @@ onSnapshot(notificationsRef,snapshot=>{
     timer.className="timer-circle";
     card.appendChild(timer);
 
-    let start = notif.startTime || Date.now();
-    let duration = notif.duration || 30000;
+    let start = notif.startTime||Date.now();
+    let duration = notif.duration||30000;
     let end = start+duration;
-
     const interval = setInterval(()=>{
       let remaining = Math.max(Math.ceil((end-Date.now())/1000),0);
       timer.textContent=remaining;
       if(remaining<=0){ card.remove(); clearInterval(interval); }
     },1000);
 
-    if(profileRole.textContent.includes("admin")||profileRole.textContent.includes("owner")){
+    const membership = profileRole.textContent.toLowerCase();
+    if(membership.includes("admin") || membership.includes("owner")){
       const removeBtn = document.createElement("button");
       removeBtn.className="removeBtn"; removeBtn.textContent="x";
       removeBtn.onclick=async()=>{ await updateDoc(doc(db,"notifications",docSnap.id),{deleted:true}); };
